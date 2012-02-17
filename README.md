@@ -1,7 +1,7 @@
 QuickFind
 =========
 
-Quickfind (or `qf`) is a UN**X tool, inspired by TextMate's Command-T plugin, for
+Quickfind (or `qf`) is a UN\*X tool, inspired by TextMate's Command-T plugin, for
 quickly finding directories under your working directory. It is primarily meant
 to be used as a part of a fast approximate `cd` command.
 
