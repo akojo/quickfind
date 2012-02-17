@@ -17,7 +17,6 @@ void dirwalk(char *name, void (*func)(char *, void *), void *ctx)
 
     func(name, ctx);
 
-    readdir(dir); readdir(dir); /* Ignore "." and ".." */
     while ((d = readdir(dir)) != NULL) {
         if (d->d_type == DT_DIR && d->d_name[0] != '.') {
             char *nextdir = dircat(name, d->d_name);
