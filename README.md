@@ -1,9 +1,9 @@
 QuickFind
 =========
 
-Quickfind (or `qf`) is a tool, inspired by TextMate's Command-T plugin, for
-quickly finding directories under your working directory. Its meant to be used,
-for example, as a part of a fast approximate `cd` command.
+Quickfind (or `qf`) is a UN**X tool, inspired by TextMate's Command-T plugin, for
+quickly finding directories under your working directory. It is primarily meant
+to be used as a part of a fast approximate `cd` command.
 
 Using QuickFind
 ---------------
@@ -13,6 +13,9 @@ for. You specify a pattern and then `qf` finds all directories whose pathname
 includes all the letters (case insensitive) in the pattern, in the given order.
 The letters need not be consequtive in the path, but more weight is given to
 paths where the letters in the pattern are next to each other.
+
+Note that `qf` ignores all hidden directories (e.g. directories whose name
+starts with a `.`).
 
 For example, if I were to find the location of all ABBA albums in my iTunes
 library:
@@ -45,6 +48,12 @@ Sabbath Bloody Sabbath$
 
 Note that in the last example I had to quote the result, since the pathname
 contained spaces.
+
+To use `qf` as a part of an approximate `cd` command, I've included a sample
+shell function `acd` in the file `acd.sh`. Just copy the function somewhere
+where your shell will load it during startup (like `.profile`, `.bashrc` etc.)
+and you have a quick way to go anywhere under your current working directory
+without having to type full pathnames.
 
 Building and Installing QuickFind
 ---------------------------------
