@@ -21,7 +21,7 @@ For example, if I were to find the location of all ABBA albums in my iTunes
 library:
 
 ```shell
-$ qf abba
+iTunes$ qf abba
 ./Music/ABBA
 ./Music/ABBA/Gold_ Greatest Hits
 ./Books/Edwin Abbott Abbott
@@ -39,15 +39,16 @@ As you can see, all the results contain the letters "ABBA" in order, but the
 paths where the letters are next to each other were given first.
 
 Or, maybe I'd like to go see the tracks on the 'Sabbath Bloody Sabbath' album:
+
 ```shell
-Music$ qf sablosab
+iTunes$ qf sablosab
 ./Music/Black Sabbath/Sabbath Bloody Sabbath
 Music$ cd "$(qf sablosab)"
 Sabbath Bloody Sabbath$
 ```
 
-Note that in the last example I had to quote the result, since the pathname
-contained spaces.
+Note that in the last example I had to quote the search result since the
+pathname contained spaces.
 
 To use `qf` as a part of an approximate `cd` command, I've included a sample
 shell function `acd` in the file `acd.sh`. Just copy the function somewhere
