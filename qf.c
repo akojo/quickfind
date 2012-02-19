@@ -72,16 +72,21 @@ int main(int argc, char *argv[])
             flags |= DW_ALL;
             break;
         case 'h':
+        case '?':
         default:
             usage();
         }
     }
+    argc -= optind;
+    argv += optind;
 
     md.dirs = array_new(1024);
-    if (argc > optind)
-        md.pattern = argv[optind];
-    else
+    if (argc == 0)
         md.pattern = "";
+    else if (argc == 1)
+        md.pattern = *argv;
+    else
+        usage();
 
     dirwalk(".", flags, matchdir, &md);
 
