@@ -78,7 +78,7 @@ int main(int argc, char *argv[])
     }
 
     md.dirs = array_new(1024);
-    if (argc >= optind)
+    if (argc > optind)
         md.pattern = argv[optind];
     else
         md.pattern = "";
