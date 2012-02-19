@@ -49,7 +49,6 @@ void printname(void *n)
 
 int main(int argc, char *argv[])
 {
-    int i;
     matchdata md;
 
     if (argc != 2) {
