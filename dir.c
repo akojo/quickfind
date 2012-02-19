@@ -3,28 +3,36 @@
 #include <stdlib.h>
 #include <string.h>
 
-static char *dircat(char *d1, char *d2)
+#include "dir.h"
+
+int skip(char *dirname)
 {
-    char *new = malloc(strlen(d1) + strlen(d2) + 2);
-    sprintf(new, "%s/%s", d1, d2);
-    return new;
+    return (dirname[0] == '.') &&
+        ((dirname[1] == '\0') || (dirname[1] == '.' && dirname[2] == '\0'));
 }
 
-void dirwalk(char *name, void (*func)(char *, void *), void *ctx)
+void dirwalk(char *dirname, int opts, void (*func)(char *, void *), void *ctx)
 {
-    DIR *dir = opendir(name);
+    DIR *dir;
+    char *name;
     struct dirent *d;
 
-    func(name, ctx);
+    dir = opendir(dirname);
+    if (!dir) return;
+
+    name = malloc(BUFSIZ); /* Should be enough for everybody */
 
     while ((d = readdir(dir)) != NULL) {
-        if (d->d_type == DT_DIR && d->d_name[0] != '.') {
-            char *nextdir = dircat(name, d->d_name);
-            dirwalk(nextdir, func, ctx);
-            free(nextdir);
-        }
+        if (d->d_name[0] == '.' && !(opts & DW_HIDDEN)) continue;
+        if (skip(d->d_name)) continue;
+
+        sprintf(name, "%s/%s", dirname, d->d_name);
+
+        func(name, ctx);
+        if (d->d_type == DT_DIR)
+            dirwalk(name, opts, func, ctx);
     }
+
+    free(name);
     closedir(dir);
 }
-
-

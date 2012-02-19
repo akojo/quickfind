@@ -2,20 +2,28 @@ QuickFind
 =========
 
 Quickfind (or `qf`) is a UN\*X tool, inspired by TextMate's Command-T plugin, for
-quickly finding directories under your working directory. It is primarily meant
-to be used as a part of a fast approximate `cd` command.
+quickly finding files and directories under your working directory. I primarily
+use it as a part of a fast approximate `cd` command and as a powerful
+alternative for the `find .  | grep pattern` idiom.
 
 Using QuickFind
 ---------------
 
+To find something, just type:
+
+```shell
+$ qf [-fa] pattern
+```
+
+By default `qf` ignores all hidden directories/files and only prints out paths
+of directories. You can make `qf` show hidden files and directories with the
+`-a` switch. To show also files in addition of directories with the `-f` switch.
+
 `qf` Uses a very simple pattern matching algorithm to find what you are looking
 for. You specify a pattern and then `qf` finds all directories whose pathname
 includes all the letters (case insensitive) in the pattern, in the given order.
-The letters need not be consequtive in the path, but more weight is given to
-paths where the letters in the pattern are next to each other.
-
-Note that `qf` ignores all hidden directories (e.g. directories whose name
-starts with a `.`).
+The letters need not be consecutive in the path, but more weight is given to
+paths where the letters of the pattern are next to each other.
 
 For example, if I were to find the location of all ABBA albums in my iTunes
 library:
@@ -36,7 +44,7 @@ iTunes$ qf abba
 ```
 
 As you can see, all the results contain the letters "ABBA" in order, but the
-paths where the letters are next to each other were given first.
+paths where the letters are consecutive were given first.
 
 Or, maybe I'd like to go see the tracks on the 'Sabbath Bloody Sabbath' album:
 

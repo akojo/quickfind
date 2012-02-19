@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 
 #include "array.h"
 #include "dir.h"
@@ -47,19 +48,42 @@ void printname(void *n)
     printf("%s\n", wstr_data(n));
 }
 
+void usage(void)
+{
+    fprintf(stderr, "Usage: qf [-af] <pattern>\n");
+    fprintf(stderr, "  -a  Show also hidden files and directories\n");
+    fprintf(stderr, "  -f  Search all kinds of files (default is only " \
+            "directories)\n");
+    fprintf(stderr, "  -h  Print this info\n");
+    exit(1);
+}
+
 int main(int argc, char *argv[])
 {
     matchdata md;
+    int flags = 0, opt;
 
-    if (argc != 2) {
-        fprintf(stderr, "Usage: qf <pattern>\n");
-        return 1;
+    while ((opt = getopt(argc, argv, "af")) != -1) {
+        switch (opt) {
+        case 'a':
+            flags |= DW_HIDDEN;
+            break;
+        case 'f':
+            flags |= DW_ALL;
+            break;
+        case 'h':
+        default:
+            usage();
+        }
     }
 
-    md.dirs = array_new(128);
-    md.pattern = argv[1];
+    md.dirs = array_new(1024);
+    if (argc >= optind)
+        md.pattern = argv[optind];
+    else
+        md.pattern = "";
 
-    dirwalk(".", matchdir, &md);
+    dirwalk(".", flags, matchdir, &md);
 
     array_sort(md.dirs, namecmp);
     array_foreach(md.dirs, printname);
