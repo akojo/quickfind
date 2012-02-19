@@ -64,11 +64,19 @@ iTunes$ qf -f sabbblosabb.m4a
 Note that in the last example I had to quote the search result since the
 pathname contained spaces.
 
-To use `qf` as a part of an approximate `cd` command, I've included a sample
-shell function `acd` in the file `acd.sh`. Just copy the function somewhere
-where your shell will load it during startup (like `.profile`, `.bashrc` etc.)
-and you have a quick way to go anywhere under your current working directory
-without having to type full pathnames.
+To use `qf` as a part of an approximate `cd` command, I have in my `.bashrc` a
+simple shell function called `acd` that allows me to easily jump into any
+subdirectory just by writing a few path fragments:
+
+```shell
+acd() {
+  if [ x$1 = x ]; then
+    echo "Usage: acd <pattern>"
+    return 1
+  fi
+  cd "$(qf $1 | sed 1q)"
+}
+```
 
 Building and Installing QuickFind
 ---------------------------------
