@@ -46,13 +46,19 @@ iTunes$ qf abba
 As you can see, all the results contain the letters "ABBA" in order, but the
 paths where the letters are consecutive were given first.
 
-Or, maybe I'd like to go see the tracks on the 'Sabbath Bloody Sabbath' album:
+Or, maybe I'd like to see the tracks on the Black Sabbath's 'Sabbath Bloody
+Sabbath' album:
 
 ```shell
-iTunes$ qf sablosab
-./Music/Black Sabbath/Sabbath Bloody Sabbath
-Music$ cd "$(qf sablosab)"
-Sabbath Bloody Sabbath$
+iTunes$ qf -f sabbblosabb.m4a
+./Music/Black Sabbath/Sabbath Bloody Sabbath/01 Sabbath Bloody Sabbath.m4a
+./Music/Black Sabbath/Sabbath Bloody Sabbath/02 A National Acrobat.m4a
+./Music/Black Sabbath/Sabbath Bloody Sabbath/03 Fluff.m4a
+./Music/Black Sabbath/Sabbath Bloody Sabbath/04 Sabbra Cadabra.m4a
+./Music/Black Sabbath/Sabbath Bloody Sabbath/05 Killing Yourself to Live.m4a
+./Music/Black Sabbath/Sabbath Bloody Sabbath/06 Who Are You_.m4a
+./Music/Black Sabbath/Sabbath Bloody Sabbath/07 Looking for Today.m4a
+./Music/Black Sabbath/Sabbath Bloody Sabbath/08 Spiral Architect.m4a
 ```
 
 Note that in the last example I had to quote the search result since the
