@@ -28,7 +28,8 @@ void dirwalk(char *dirname, int opts, void (*func)(char *, void *), void *ctx)
 
         sprintf(name, "%s/%s", dirname, d->d_name);
 
-        func(name, ctx);
+        if (d->d_type == DT_DIR || (opts & DW_ALL))
+            func(name, ctx);
         if (d->d_type == DT_DIR)
             dirwalk(name, opts, func, ctx);
     }
