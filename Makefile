@@ -5,6 +5,7 @@ OBJS = $(subst .c,.o,$(wildcard *.c))
 $(PROGRAM): $(OBJS)
 
 install: $(PROGRAM)
+	mkdir -p $(PREFIX)/bin
 	install $(PROGRAM) $(PREFIX)/bin
 
 uninstall:
