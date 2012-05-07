@@ -90,7 +90,7 @@ By default `qf` installs into `/usr/bin`, but you can easily change the location
 by giving a different prefix during installation:
 
 ```shell
-PREFIX=~/bin make install
+PREFIX=~/ make install
 ```
 
 Similarly, since the `qf` Makefile only uses implicit rules, you can control the
