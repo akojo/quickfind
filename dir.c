@@ -13,14 +13,12 @@ static int skip(char *dirname)
 
 static void walk(char *name, int opts, void (*func)(char *, void *), void *ctx)
 {
-    DIR *dir;
-	char* endp;
+    DIR *dir = opendir(name);
+	char* endp = name + strlen(name);
     struct dirent *d;
 
-    dir = opendir(name);
     if (!dir) return;
 
-	endp = name + strlen(name);
 	*endp++ = '/';
 
     while ((d = readdir(dir)) != NULL) {
@@ -29,24 +27,15 @@ static void walk(char *name, int opts, void (*func)(char *, void *), void *ctx)
 
         strcpy(endp, d->d_name);
 
-        switch (d->d_type) {
-        case DT_DIR:
-           if (opts & DW_DIRECTORIES) {
-               func(name, ctx);
-           }
+		if (d->d_type == DT_DIR) {
+           if (opts & DW_DIRECTORIES)
+			   func(name, ctx);
            walk(name, opts, func, ctx);
-           break;
-        case DT_REG:
-        case DT_LNK:
-           if (opts & DW_FILES) {
-               func(name, ctx);
-           }
-           break;
-        default:
-           break;
+		}
+		else if (opts & DW_FILES) {
+			func(name, ctx);
         }
     }
-
     closedir(dir);
 }
 
