@@ -5,35 +5,36 @@
 
 #include "dir.h"
 
-int skip(char *dirname)
+static int skip(char *dirname)
 {
     return (dirname[0] == '.') &&
         ((dirname[1] == '\0') || (dirname[1] == '.' && dirname[2] == '\0'));
 }
 
-void dirwalk(char *dirname, int opts, void (*func)(char *, void *), void *ctx)
+static void walk(char *name, int opts, void (*func)(char *, void *), void *ctx)
 {
     DIR *dir;
-    char *name;
+	char* endp;
     struct dirent *d;
 
-    dir = opendir(dirname);
+    dir = opendir(name);
     if (!dir) return;
 
-    name = malloc(FILENAME_MAX);
+	endp = name + strlen(name);
+	*endp++ = '/';
 
     while ((d = readdir(dir)) != NULL) {
         if (skip(d->d_name)) continue;
         if (d->d_name[0] == '.' && !(opts & DW_HIDDEN)) continue;
 
-        sprintf(name, "%s/%s", dirname, d->d_name);
+        strcpy(endp, d->d_name);
 
         switch (d->d_type) {
         case DT_DIR:
            if (opts & DW_DIRECTORIES) {
                func(name, ctx);
            }
-           dirwalk(name, opts, func, ctx);
+           walk(name, opts, func, ctx);
            break;
         case DT_REG:
         case DT_LNK:
@@ -46,6 +47,12 @@ void dirwalk(char *dirname, int opts, void (*func)(char *, void *), void *ctx)
         }
     }
 
-    free(name);
     closedir(dir);
+}
+
+void dirwalk(char *dirname, int opts, void (*func)(char *, void *), void *ctx)
+{
+	char* buf = malloc(FILENAME_MAX);
+	strcpy(buf, dirname);
+	walk(buf, opts, func, ctx);
 }
