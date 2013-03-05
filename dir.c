@@ -20,18 +20,30 @@ void dirwalk(char *dirname, int opts, void (*func)(char *, void *), void *ctx)
     dir = opendir(dirname);
     if (!dir) return;
 
-    name = malloc(BUFSIZ); /* Should be enough for everybody */
+    name = malloc(FILENAME_MAX);
 
     while ((d = readdir(dir)) != NULL) {
-        if (d->d_name[0] == '.' && !(opts & DW_HIDDEN)) continue;
         if (skip(d->d_name)) continue;
+        if (d->d_name[0] == '.' && !(opts & DW_HIDDEN)) continue;
 
         sprintf(name, "%s/%s", dirname, d->d_name);
 
-        if (d->d_type == DT_DIR || (opts & DW_ALL))
-            func(name, ctx);
-        if (d->d_type == DT_DIR)
-            dirwalk(name, opts, func, ctx);
+        switch (d->d_type) {
+        case DT_DIR:
+           if (opts & DW_DIRECTORIES) {
+               func(name, ctx);
+           }
+           dirwalk(name, opts, func, ctx);
+           break;
+        case DT_REG:
+        case DT_LNK:
+           if (opts & DW_FILES) {
+               func(name, ctx);
+           }
+           break;
+        default:
+           break;
+        }
     }
 
     free(name);
