@@ -62,9 +62,6 @@ iTunes$ qf -f sabbblosabb.m4a
 ./Music/Black Sabbath/Sabbath Bloody Sabbath/08 Spiral Architect.m4a
 ```
 
-Note that in the last example I had to quote the search result since the
-pathname contained spaces.
-
 To use `qf` as a part of an approximate `cd` command, I have in my `.bashrc` a
 simple shell function called `acd` that allows me to easily jump into any
 subdirectory just by writing a few path fragments:
