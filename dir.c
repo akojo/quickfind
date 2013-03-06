@@ -44,4 +44,5 @@ void dirwalk(char *dirname, int opts, void (*func)(char *, void *), void *ctx)
 	char* buf = malloc(FILENAME_MAX);
 	strcpy(buf, dirname);
 	walk(buf, opts, func, ctx);
+	free(buf);
 }
