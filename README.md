@@ -3,8 +3,8 @@ QuickFind
 
 Quickfind (or `qf`) is a UN\*X tool, inspired by TextMate's Command-T plugin, for
 quickly finding files and directories under your working directory. I primarily
-use it as a part of a fast approximate `cd` command and as a powerful
-alternative for the `find .  | grep pattern` idiom.
+use it as a part of a fast approximate `cd` command and as a powerful and simple
+alternative for the `find .  | grep <pattern>` idiom.
 
 Using QuickFind
 ---------------
@@ -12,12 +12,13 @@ Using QuickFind
 To find something, just type:
 
 ```shell
-$ qf [-fa] pattern
+$ qf [-dfa] pattern
 ```
 
 By default `qf` ignores all hidden directories/files and only prints out paths
-of directories. You can make `qf` show hidden files and directories with the
-`-a` switch. To show also files in addition of directories with the `-f` switch.
+of all files and directories under current directory. You can make `qf` show
+hidden files and directories with the `-a` option. To show only files use
+the `-f` option, and for only directories use the `-d` option.
 
 `qf` Uses a very simple pattern matching algorithm to find what you are looking
 for. You specify a pattern and then `qf` finds all directories whose pathname
@@ -29,7 +30,7 @@ For example, if I were to find the location of all ABBA albums in my iTunes
 library:
 
 ```shell
-iTunes$ qf abba
+iTunes$ qf -d abba
 ./Music/ABBA
 ./Music/ABBA/Gold_ Greatest Hits
 ./Books/Edwin Abbott Abbott
@@ -74,7 +75,7 @@ acd() {
     echo "Usage: acd <pattern>"
     return 1
   fi
-  cd "$(qf $1 | sed 1q)"
+  cd "$(qf -d $1 | sed 1q)"
 }
 ```
 
@@ -98,11 +99,10 @@ C compiler and the compiler flags with environment variables. Maybe you'd like
 to compile `qf` with `clang` with full optimizations:
 
 ```shell
-CC=clang CFLAGS=-O4 make
+CC=clang CFLAGS=-O4 LDFLAGS=-O4 make
 ```
 
 You get the idea.
 
 Removing `qf` is as simple as a `make uninstall`. Just remember to give the same
-prefix that you used during installation since the Makefile doesn't remember it
-(maybe it should).
+prefix that you used during installation since the Makefile doesn't remember it.
