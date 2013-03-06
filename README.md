@@ -16,9 +16,10 @@ $ qf [-dfa] pattern
 ```
 
 By default `qf` ignores all hidden directories/files and only prints out paths
-of all files and directories under current directory. You can make `qf` show
+of files and directories under current directory. You can make `qf` show
 hidden files and directories with the `-a` option. To show only files use
-the `-f` option, and for only directories use the `-d` option.
+the `-f` option, and for only directories use the `-d` option. The default
+behavior is the same as `-df`.
 
 `qf` Uses a very simple pattern matching algorithm to find what you are looking
 for. You specify a pattern and then `qf` finds all directories whose pathname
