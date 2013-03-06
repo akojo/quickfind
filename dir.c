@@ -14,26 +14,28 @@ static int skip(char *dirname)
 static void walk(char *name, int opts, void (*func)(char *, void *), void *ctx)
 {
     DIR *dir = opendir(name);
-	char* endp = name + strlen(name);
+    int namelen = strlen(name);
+    char* endp = name + namelen;
     struct dirent *d;
 
     if (!dir) return;
 
-	*endp++ = '/';
+    *endp++ = '/';
 
     while ((d = readdir(dir)) != NULL) {
         if (skip(d->d_name)) continue;
         if (d->d_name[0] == '.' && !(opts & DW_HIDDEN)) continue;
+        if (strlen(d->d_name) + namelen >= FILENAME_MAX) continue;
 
         strcpy(endp, d->d_name);
 
-		if (d->d_type == DT_DIR) {
+        if (d->d_type == DT_DIR) {
            if (opts & DW_DIRECTORIES)
-			   func(name, ctx);
+               func(name, ctx);
            walk(name, opts, func, ctx);
-		}
-		else if (opts & DW_FILES) {
-			func(name, ctx);
+        }
+        else if (opts & DW_FILES) {
+            func(name, ctx);
         }
     }
     closedir(dir);
@@ -41,8 +43,8 @@ static void walk(char *name, int opts, void (*func)(char *, void *), void *ctx)
 
 void dirwalk(char *dirname, int opts, void (*func)(char *, void *), void *ctx)
 {
-	char* buf = malloc(FILENAME_MAX);
-	strcpy(buf, dirname);
-	walk(buf, opts, func, ctx);
-	free(buf);
+    char* buf = malloc(FILENAME_MAX);
+    strcpy(buf, dirname);
+    walk(buf, opts, func, ctx);
+    free(buf);
 }
