@@ -14,6 +14,6 @@ uninstall:
 $(OBJS): Makefile
 $(PROGRAM).o: $(wildcard *.h)
 
-.PHONY: clean uninstall
+.PHONY: clean install uninstall
 clean:
 	rm -f qf *.o
