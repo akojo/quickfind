@@ -50,15 +50,15 @@ void printname(void *n)
 
 void usage(void)
 {
-	fprintf(stderr, "Quickfind version 1.0\n");
+    fprintf(stderr, "Quickfind version 1.0\n");
     fprintf(stderr, "Usage: qf [-adf] <pattern>\n");
     fprintf(stderr, "       qf -h\n");
-	fprintf(stderr, "Where options are:\n");
+    fprintf(stderr, "Where options are:\n");
     fprintf(stderr, "  -a  Show also hidden files and directories\n");
-	fprintf(stderr, "  -d  Print matching directories\n");
+    fprintf(stderr, "  -d  Print matching directories\n");
     fprintf(stderr, "  -f  Print matching files\n");
     fprintf(stderr, "  -h  Print this info and exit\n");
-	fprintf(stderr, "Omitting both 'd' and 'f' flags is the same as specifying -df\n");
+    fprintf(stderr, "Omitting both 'd' and 'f' flags is the same as specifying -df\n");
     exit(1);
 }
 
@@ -72,9 +72,9 @@ int main(int argc, char *argv[])
         case 'a':
             flags |= DW_HIDDEN;
             break;
-		case 'd':
-			flags |= DW_DIRECTORIES;
-			break;
+        case 'd':
+            flags |= DW_DIRECTORIES;
+            break;
         case 'f':
             flags |= DW_FILES;
             break;
@@ -87,9 +87,9 @@ int main(int argc, char *argv[])
     argc -= optind;
     argv += optind;
 
-	if ((flags & (DW_DIRECTORIES | DW_FILES)) == 0) {
-		flags |= DW_DIRECTORIES | DW_FILES;
-	}
+    if ((flags & (DW_DIRECTORIES | DW_FILES)) == 0) {
+        flags |= DW_DIRECTORIES | DW_FILES;
+    }
 
     md.dirs = array_new(1024);
     if (argc == 0)
