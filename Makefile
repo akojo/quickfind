@@ -2,6 +2,8 @@ PREFIX ?= /usr
 PROGRAM = qf
 OBJS = $(subst .c,.o,$(wildcard *.c))
 
+all: $(PROGRAM)
+
 $(PROGRAM): $(OBJS)
 
 install: $(PROGRAM)
@@ -14,6 +16,6 @@ uninstall:
 $(OBJS): Makefile
 $(PROGRAM).o: $(wildcard *.h)
 
-.PHONY: clean uninstall
+.PHONY: all clean install uninstall
 clean:
 	rm -f qf *.o
