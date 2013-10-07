@@ -51,7 +51,7 @@ void printname(void *n)
 void usage(void)
 {
     fprintf(stderr, "Quickfind version 1.0\n");
-    fprintf(stderr, "Usage: qf [-adf] <pattern>\n");
+    fprintf(stderr, "Usage: qf [-adf] <pattern> [path...]\n");
     fprintf(stderr, "       qf -h\n");
     fprintf(stderr, "Where options are:\n");
     fprintf(stderr, "  -a  Show also hidden files and directories\n");
@@ -94,12 +94,20 @@ int main(int argc, char *argv[])
     md.dirs = array_new(1024);
     if (argc == 0)
         md.pattern = "";
-    else if (argc == 1)
+    else 
         md.pattern = *argv;
-    else
-        usage();
 
-    dirwalk(".", flags, matchdir, &md);
+    if (argc == 1)
+        dirwalk(".", flags, matchdir, &md);
+    else {
+        int i;
+        for (i = 1; i < argc; ++i) {
+            int len = strlen(argv[i]);
+            if (argv[i][len - 1] == '/')
+                argv[i][len - 1] = '\0';
+            dirwalk(argv[i], flags, matchdir, &md);
+        }
+    }
 
     array_sort(md.dirs, namecmp);
     array_foreach(md.dirs, printname);
