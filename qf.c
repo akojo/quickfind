@@ -97,7 +97,7 @@ int main(int argc, char *argv[])
     else 
         md.pattern = *argv;
 
-    if (argc == 1)
+    if (argc < 2)
         dirwalk(".", flags, matchdir, &md);
     else {
         int i;
