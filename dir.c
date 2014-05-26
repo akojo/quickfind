@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/stat.h>
 
 #include "dir.h"
 
@@ -9,6 +10,17 @@ static int skip(char *dirname)
 {
     return (dirname[0] == '.') &&
         ((dirname[1] == '\0') || (dirname[1] == '.' && dirname[2] == '\0'));
+}
+
+static int is_dir(struct dirent *d, char *name)
+{
+    struct stat s;
+#if defined(DT_DIR) && defined(DT_UNKNOWN)
+    return d->d_type == DT_DIR ||
+        (d->d_type == DT_UNKNOWN && stat(name, &s) == 0 && S_ISDIR(s.st_mode));
+#else
+    return stat(name, &s) == 0 && S_ISDIR(s.st_mode);
+#endif
 }
 
 static void walk(char *name, int opts, void (*func)(char *, void *), void *ctx)
@@ -29,7 +41,7 @@ static void walk(char *name, int opts, void (*func)(char *, void *), void *ctx)
 
         strcpy(endp, d->d_name);
 
-        if (d->d_type == DT_DIR) {
+        if (is_dir(d, name)) {
            if (opts & DW_DIRECTORIES)
                func(name, ctx);
            walk(name, opts, func, ctx);
