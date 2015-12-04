@@ -1,6 +1,8 @@
 PREFIX ?= /usr
 PROGRAM = qf
-OBJS = $(subst .c,.o,$(wildcard *.c))
+OBJS = $(subst .cpp,.o,$(wildcard *.cpp))
+CXXFLAGS += -std=c++11 -Wall -Werror
+CC = $(CXX)
 
 all: $(PROGRAM)
 

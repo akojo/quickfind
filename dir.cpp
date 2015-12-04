@@ -4,15 +4,23 @@
 #include <string.h>
 #include <sys/stat.h>
 
+#include <array>
+
 #include "dir.h"
 
-static int skip(char *dirname)
+using namespace std;
+
+static bool skip(const char *dirname, int opts) noexcept
 {
-    return (dirname[0] == '.') &&
-        ((dirname[1] == '\0') || (dirname[1] == '.' && dirname[2] == '\0'));
+    if (dirname[0] == '.') {
+        return (!(opts & DW_HIDDEN)) ||
+            (dirname[1] == '\0') ||
+            (dirname[1] == '.' && dirname[2] == '\0');
+    }
+    return false;
 }
 
-static int is_dir(struct dirent *d, char *name)
+static int is_dir(struct dirent *d, const char *name) noexcept
 {
     struct stat s;
 #if defined(DT_DIR) && defined(DT_UNKNOWN)
@@ -23,7 +31,7 @@ static int is_dir(struct dirent *d, char *name)
 #endif
 }
 
-static void walk(char *name, int opts, void (*func)(char *, void *), void *ctx)
+static void walk(char *name, int opts, function<void(const char*)> func) noexcept
 {
     DIR *dir = opendir(name);
     int namelen = strlen(name);
@@ -35,28 +43,25 @@ static void walk(char *name, int opts, void (*func)(char *, void *), void *ctx)
     *endp++ = '/';
 
     while ((d = readdir(dir)) != NULL) {
-        if (skip(d->d_name)) continue;
-        if (d->d_name[0] == '.' && !(opts & DW_HIDDEN)) continue;
+        if (skip(d->d_name, opts)) continue;
         if (strlen(d->d_name) + namelen >= FILENAME_MAX) continue;
 
         strcpy(endp, d->d_name);
 
         if (is_dir(d, name)) {
-           if (opts & DW_DIRECTORIES)
-               func(name, ctx);
-           walk(name, opts, func, ctx);
+           if (opts & DW_DIRECTORIES) func(name);
+           walk(name, opts, func);
         }
         else if (opts & DW_FILES) {
-            func(name, ctx);
+            func(name);
         }
     }
     closedir(dir);
 }
 
-void dirwalk(char *dirname, int opts, void (*func)(char *, void *), void *ctx)
+void dirwalk(string dirname, int opts, function<void(const char*)> func)
 {
-    char* buf = malloc(FILENAME_MAX);
-    strcpy(buf, dirname);
-    walk(buf, opts, func, ctx);
-    free(buf);
+    char buf[FILENAME_MAX];
+    strncpy(buf, dirname.c_str(), FILENAME_MAX - 1);
+    walk(buf, opts, func);
 }
