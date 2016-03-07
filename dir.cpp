@@ -33,9 +33,9 @@ static int is_dir(struct dirent *d, const char *name) noexcept
 
 static void walk(char *name, int opts, function<void(const char*)> func) noexcept
 {
-    DIR *dir = opendir(name);
-    int namelen = strlen(name);
-    char* endp = name + namelen;
+    auto dir = opendir(name);
+    auto namelen = strlen(name);
+    auto endp = name + namelen;
     struct dirent *d;
 
     if (!dir) return;

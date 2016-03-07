@@ -2,6 +2,7 @@
 #define MATCH_H
 
 #include <string>
+#include <strings.h>
 #include <vector>
 
 struct wstr {

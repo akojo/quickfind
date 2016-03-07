@@ -6,7 +6,7 @@ using namespace std;
 
 static int smatch(const string& str, const string& pat)
 {
-    int score = 1, dist = INT_MAX;
+    auto score = 1, dist = 0;
     auto si = str.cbegin();
     auto pi = pat.cbegin();
 
