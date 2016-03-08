@@ -18,7 +18,7 @@ endef
 prefix ?= /usr
 programs = qf qs
 qf_objs = qf.o dir.o match.o
-qs_objs = qs.o match.o
+qs_objs = qs.o match.o term.o
 qs_ldflags = -lncurses
 
 CXXFLAGS += -std=c++14 -Wall -Werror

@@ -1,11 +1,14 @@
-#include <cctype>
-#include <iostream>
 #include "match.h"
-#include <ncurses.h>
+#include "term.h"
+
+#include <algorithm>
+#include <iostream>
 #include <string>
 #include <vector>
 
 using namespace std;
+
+static const int MAXLINES = 20;
 
 int main(void)
 {
@@ -14,47 +17,70 @@ int main(void)
 
     while (getline(cin, line)) input.emplace_back(line);
 
-    FILE *output = fdopen(dup(fileno(stdout)), "w");
-    freopen("/dev/tty", "r", stdin);
-    freopen("/dev/tty", "w", stdout);
-
-    initscr();
-    raw();
-    noecho();
-
-    int width, height;
-    getmaxyx(stdscr, width, height);
+    Term tty("/dev/tty");
+    Term::Size screen_size = tty.get_screen_size();
 
     char ch;
+    int selection = 1;
     string search;
-    mvprintw(0, 0, "%d > ", input.size());
-    while ((ch = getch()) != ERR) {
-        if (ch == 3 || ch == 10) break;
-        else if (ch == 127) {
-            if (search.length() > 0) search.erase(search.cend() - 1);
-        }
-        else if (ch == 21) search.clear();
-        else search += ch;
 
-        erase();
-
-        mvprintw(1, 0, "%s %d ", keyname(ch), ch);
-
+    tty.erase_display(Term::FORWARD);
+    tty.puts("> \n");
+    for (;;) {
         auto last = match(input.begin(), input.end(), search);
         auto it = input.cbegin();
-        for (int i = 2; i < height && it != last; ++i, ++it) {
-            if (i == 2) attron(A_REVERSE);
-            mvprintw(i, 0, "%s", (*it).str.c_str());
-            attroff(A_REVERSE);
+        int i = 1;
+        for (; it != last; ++i, ++it) {
+            string str = (*it).str.substr(0, screen_size.columns);
+            if (i == selection) {
+                tty.puts("\033[7m");
+                tty.puts(str.c_str());
+                tty.puts("\033[0m");
+            } else {
+                tty.puts(str.c_str());
+            }
+            if (i == MAXLINES)
+                break;
+            tty.putchar('\n');
         }
+        tty.cursor_up(i);
+        tty.move_to_col(3 + search.length());
 
-        mvprintw(0, 0, "%d > %s", (last - input.begin()), search.c_str());
+        ch = tty.getchar();
+        if (ch == Term::ESC || ch == Term::CTRL_C || ch == Term::ENTER) {
+            break;
+        } else if (ch == Term::DEL || ch == Term::BACKSPACE) {
+            if (search.length() > 0) {
+                search.erase(search.cend() - 1);
+                tty.cursor_back(1);
+                tty.erase_line(Term::FORWARD);
+            }
+            selection = 1;
+        } else if (ch == Term::CTRL_N) {
+            selection = min(selection + 1, i);
+        } else if (ch == Term::CTRL_P) {
+            selection = max(selection - 1, 1);
+        } else if (ch == Term::CTRL_U) {
+            search.clear();
+            tty.erase_line();
+            tty.move_to_col(1);
+            tty.puts("> ");
+            selection = 1;
+        } else {
+            search += ch;
+            tty.putchar(ch);
+            selection = 1;
+        }
+        tty.putchar('\n');
+        tty.erase_display(Term::FORWARD);
     }
 
-    endwin();
+    tty.move_to_col(1);
+    tty.erase_display(Term::FORWARD);
 
-    if (ch == 10)
-        fprintf(output, "%s\n", input[0].str.c_str());
-
-    return 0;
+    if (ch == Term::ENTER) {
+        cout << input[selection - 1].str.c_str() << endl;
+        return 0;
+    }
+    return 1;
 }
