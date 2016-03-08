@@ -39,7 +39,7 @@ clean:
 $(foreach prog,$(programs), $(eval $(call program-deps,$(prog))))
 
 %.o: %.cpp
-	$(call make-depend,$<,$@)
+	@$(call make-depend,$<,$@)
 	$(COMPILE.cpp) $(OUTPUT_OPTION) $<
 
 ifneq "$(MAKECMDGOALS)" "clean"
