@@ -16,10 +16,9 @@ $(COMPILE.cpp) -MM -MF $(call to-deps,$1) -MP -MT $2 $1
 endef
 
 prefix ?= /usr
-programs = qf qs
-qf_objs = qf.o dir.o match.o
-qs_objs = qs.o match.o term.o
-qs_ldflags = -lncurses
+programs = qfind qselect
+qfind_objs = qfind.o dir.o match.o
+qselect_objs = qselect.o match.o term.o
 
 CXXFLAGS += -std=c++14 -Wall -Werror
 
