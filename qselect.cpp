@@ -57,7 +57,7 @@ int main(void)
             }
             selection = 1;
         } else if (ch == Term::CTRL_N) {
-            selection = min(selection + 1, i);
+            selection = min(selection + 1, i - 1);
         } else if (ch == Term::CTRL_P) {
             selection = max(selection - 1, 1);
         } else if (ch == Term::CTRL_U) {
