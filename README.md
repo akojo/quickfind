@@ -1,106 +1,88 @@
-QuickFind
-=========
+# QuickFind
 
-Quickfind (or `qf`) is a UN\*X tool, inspired by TextMate's Command-T plugin, for
-quickly finding files and directories under your working directory. I primarily
-use it as a part of a fast approximate `cd` command and as a powerful and simple
-alternative for the `find .  | grep <pattern>` idiom.
+QuickFind is a set of two small command-line utilities utilizing the same fuzzy
+matching algorithm:
 
-Using QuickFind
----------------
+* `qfind` to quickly find files and directories, and
+* `qselect` to quickly select a string from a list of strings
 
-To find something, just type:
+`qfind` grew out of frustration towards the classic `find . -type f | grep`
+approach when either trying match several parts of the file path, or not having a very clear
+recollection of what was the exact name of the file to be searched.
 
-```shell
-$ qf [-dfa] pattern
+`qselect` is pretty much a direct replacement for
+[selecta](https://github.com/garybernhardt/selecta),
+the main difference being that it should be quite a bit faster since it's been
+written in C++ instead of Ruby.
+
+## qfind
+
+`qfind` is very simple file/directory search program, its invocation being
+
+```sh
+qfind [-adf] [pattern] [path...]
+```
+Without any command line arguments `qfind` will list all files and directories
+reachable from current working directory. With search pattern, it will only
+return matching names. Restricting the search to certain subdirectories is done
+by listing the directory names after search pattern.
+
+Option `-a` will include also hidden files/directories, `-f` shows only files
+and `-d` shows only directories.
+
+### Examples
+
+* `find . - type f`, i.e. all files under current directory
+```sh
+qfind -f
+```
+* Find the songs for _Black Sabbath_'s Album _Sabbath Bloody Sabbath_ from my music library
+```sh
+qfind -f blackbloody
+```
+* Find out where'd I put `qselect.cpp`
+```sh
+qfind -f qselectcpp
 ```
 
-By default `qf` ignores all hidden directories/files and only prints out paths
-of files and directories under current directory. You can make `qf` show
-hidden files and directories with the `-a` option. To show only files use
-the `-f` option, and for only directories use the `-d` option. The default
-behavior is the same as `-df`.
+Incidentally, the last search takes about 300 milliseconds on my computer, inside a
+source directory containing about 90000 files inside 18000 directories.
 
-`qf` Uses a very simple pattern matching algorithm to find what you are looking
-for. You specify a pattern and then `qf` finds all directories whose pathname
-includes all the letters (case insensitive) in the pattern, in the given order.
-The letters need not be consecutive in the path, but more weight is given to
-paths where the letters of the pattern are next to each other.
+## qselect
 
-For example, if I were to find the location of all ABBA albums in my iTunes
-library:
+`qselect` works pretty much like its role model `selecta`. It reads the list of search
+strings from standard input, presents a search UI to the user, and then either prints
+selection to its standard out or prints nothing and exits with status of `1`.
 
-```shell
-iTunes$ qf -d abba
-./Music/ABBA
-./Music/ABBA/Gold_ Greatest Hits
-./Books/Edwin Abbott Abbott
-./Music/Black Sabbath
-./Music/Black Sabbath/Sabbath Bloody Sabbath
-./Music/Nat Newborn/Back To The Moon
-./Music/Carbonne - Di Piazza - Manring/Carbonne - Di Piazza - Manring
-./Music/Iron Maiden/The Number of the Beast
-./Music/Laura Branigan/The Best of Branigan
-./Music/Manu Dibango/African Soul - The Very Best of Manu Dibango
-./Music/The Cranberries/Everybody Else Is Doing It, So Why Can't We_
-```
+The search UI is presented by opening `/dev/tty` and reading/writing there, so that when
+`qselect` is used in a pipeline, only the selected string will be written to stdout.
 
-As you can see, all the results contain the letters "ABBA" in order, but the
-paths where the letters are consecutive were given first.
+`qselect` has a few useful key bindinings to control the search UI:
 
-Or, maybe I'd like to see the tracks on the Black Sabbath's 'Sabbath Bloody
-Sabbath' album:
+* `Ctrl-C` will exit the program with an error status (1) and prints nothing
+* `Ctrl-U` clears the search string
+* `Ctrl-N` and `Ctrl-P` select the next and previous match from the presented list
+* `Enter` selects the highlighted match and prints it to standard out
 
-```shell
-iTunes$ qf -f sabbblosabb.m4a
-./Music/Black Sabbath/Sabbath Bloody Sabbath/01 Sabbath Bloody Sabbath.m4a
-./Music/Black Sabbath/Sabbath Bloody Sabbath/02 A National Acrobat.m4a
-./Music/Black Sabbath/Sabbath Bloody Sabbath/03 Fluff.m4a
-./Music/Black Sabbath/Sabbath Bloody Sabbath/04 Sabbra Cadabra.m4a
-./Music/Black Sabbath/Sabbath Bloody Sabbath/05 Killing Yourself to Live.m4a
-./Music/Black Sabbath/Sabbath Bloody Sabbath/06 Who Are You_.m4a
-./Music/Black Sabbath/Sabbath Bloody Sabbath/07 Looking for Today.m4a
-./Music/Black Sabbath/Sabbath Bloody Sabbath/08 Spiral Architect.m4a
-```
+## Building and installing
 
-To use `qf` as a part of an approximate `cd` command, I have in my `.bashrc` a
-simple shell function called `acd` that allows me to easily jump into any
-subdirectory just by writing a few path fragments:
+To build and install both programs, just run
 
-```shell
-acd() {
-  if [ x$1 = x ]; then
-    echo "Usage: acd <pattern>"
-    return 1
-  fi
-  cd "$(qf -d $1 | sed 1q)"
-}
-```
+`$ make && make install`
 
-Building and Installing QuickFind
----------------------------------
+By default the `Makefile` will try to install the programs under `/usr`; this
+can be changed using `PREFIX` environment variable, e.g.
 
-```shell
-make
-make install
-```
+`$ PREFIX=~/ make && make install`
 
-By default `qf` installs into `/usr/bin`, but you can easily change the location
-by giving a different prefix during installation:
+## Algorithm
 
-```shell
-PREFIX=~/ make install
-```
+The programs both use the same fuzzy matching algorithm:
+a weighted subsequence match, i.e. all the characters of the search string
+must be present in the target string in order, but not necessarily adjacent.
+As a useful heuristic the algorithm gives larger weight to input strings
+that have the characters of the search string adjacent to each other.
 
-Similarly, since the `qf` Makefile only uses implicit rules, you can control the
-C compiler and the compiler flags with environment variables. Maybe you'd like
-to compile `qf` with `clang` with full optimizations:
-
-```shell
-CC=clang CFLAGS=-O4 LDFLAGS=-O4 make
-```
-
-You get the idea.
-
-Removing `qf` is as simple as a `make uninstall`. Just remember to give the same
-prefix that you used during installation since the Makefile doesn't remember it.
+For example, searching for "qfind" will find both `qfind` and `quickfind`,
+but `qfind` will be sorted earlier because it matches exactly whereas `q` is
+separate from the rest of the match characters in `quickfind`.
