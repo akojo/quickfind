@@ -65,7 +65,7 @@ int main(int argc, char *argv[])
     string pattern = argc == 0 ? "" : *argv;
     vector<wstr> strings;
     for (auto& dir : dirs)
-        dirwalk(dir, flags, [&](auto name) { strings.emplace_back(name); });
+        dirwalk(dir, flags, [&](auto name) { strings.emplace_back(wstr{name}); });
     auto last = match(strings.begin(), strings.end(), pattern);
     for_each(strings.begin(), last, [](auto& s) { puts(s.str.c_str()); });
 

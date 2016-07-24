@@ -10,7 +10,9 @@
 
 using namespace std;
 
-static bool skip(const char *dirname, int opts) noexcept
+namespace {
+
+bool skip(const char *dirname, int opts) noexcept
 {
     if (dirname[0] == '.') {
         return (!(opts & DW_HIDDEN)) ||
@@ -20,7 +22,7 @@ static bool skip(const char *dirname, int opts) noexcept
     return false;
 }
 
-static int is_dir(struct dirent *d, const char *name) noexcept
+int is_dir(struct dirent *d, const char *name) noexcept
 {
     struct stat s;
 #if defined(DT_DIR) && defined(DT_UNKNOWN)
@@ -31,37 +33,38 @@ static int is_dir(struct dirent *d, const char *name) noexcept
 #endif
 }
 
-static void walk(char *name, int opts, function<void(const char*)> func) noexcept
+void walk(const string& name, int opts, FoundFunc func)
 {
-    auto dir = opendir(name);
-    auto namelen = strlen(name);
-    auto endp = name + namelen;
-    struct dirent *d;
+    auto dir = opendir(name.c_str());
+    struct dirent* d;
+    string path = name;
+    path.push_back('/');
+    auto path_end = std::distance(path.begin(), path.end());
+    path.resize(FILENAME_MAX);
 
     if (!dir) return;
 
-    *endp++ = '/';
-
     while ((d = readdir(dir)) != NULL) {
         if (skip(d->d_name, opts)) continue;
-        if (strlen(d->d_name) + namelen >= FILENAME_MAX) continue;
 
-        strcpy(endp, d->d_name);
+        path.insert(path.erase(path.begin() + path_end, path.end()),
+                    d->d_name,
+                    d->d_name + d->d_namlen);
 
-        if (is_dir(d, name)) {
-           if (opts & DW_DIRECTORIES) func(name);
-           walk(name, opts, func);
+        if (is_dir(d, name.c_str())) {
+            if (opts & DW_DIRECTORIES) func(path);
+            walk(path, opts, func);
         }
         else if (opts & DW_FILES) {
-            func(name);
+            func(path);
         }
     }
     closedir(dir);
 }
 
-void dirwalk(string dirname, int opts, function<void(const char*)> func)
+} // namespace
+
+void dirwalk(string dirname, int opts, FoundFunc func)
 {
-    char buf[FILENAME_MAX];
-    strncpy(buf, dirname.c_str(), FILENAME_MAX - 1);
-    walk(buf, opts, func);
+    walk(dirname, opts, func);
 }

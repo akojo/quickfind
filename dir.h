@@ -8,6 +8,8 @@
 #define DW_DIRECTORIES  2   /* Process directories */
 #define DW_FILES        4   /* Process files */
 
-void dirwalk(std::string name, int opts, std::function<void(const char*)> func);
+using FoundFunc = std::function<void(const std::string&)>;
+
+void dirwalk(std::string name, int opts, FoundFunc func);
 
 #endif /* end of include guard: DIR_H */
