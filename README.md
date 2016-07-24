@@ -64,6 +64,14 @@ The search UI is presented by opening `/dev/tty` and reading/writing there, so t
 * `Ctrl-N` and `Ctrl-P` select the next and previous match from the presented list
 * `Enter` selects the highlighted match and prints it to standard out
 
+To search the contents of a file use the following command
+
+```
+qselect < <path to file>
+```
+
+now you can type the keywords and get the appropriate results.
+
 ## Building and installing
 
 To build and install both programs, just run
