@@ -1,5 +1,6 @@
 #include "match.h"
 #include "term.h"
+#include "prompt.h"
 
 #include <algorithm>
 #include <iostream>
@@ -22,20 +23,17 @@ int main(void)
 
     char ch;
     int selection = 1;
-    string search;
+    Prompt prompt(tty, "> ");
 
     tty.erase_display(Term::FORWARD);
-    tty.puts("> \n");
     for (;;) {
-        auto last = match(input.begin(), input.end(), search);
+        auto last = match(input.begin(), input.end(), prompt.query());
         auto it = input.cbegin();
         int i = 1;
         for (; it != last; ++i, ++it) {
             string str = (*it).str.substr(0, screen_size.columns);
             if (i == selection) {
-                tty.puts("\033[7m");
-                tty.puts(str.c_str());
-                tty.puts("\033[0m");
+                tty.puts_highlighted(str.c_str());
             } else {
                 tty.puts(str.c_str());
             }
@@ -44,32 +42,19 @@ int main(void)
             tty.putchar('\n');
         }
         tty.cursor_up(i);
-        tty.move_to_col(3 + search.length());
+        tty.move_to_col(prompt.current_column());
 
         ch = tty.getchar();
         if (ch == Term::ESC || ch == Term::CTRL_C || ch == Term::ENTER) {
             break;
-        } else if (ch == Term::DEL || ch == Term::BACKSPACE) {
-            if (search.length() > 0) {
-                search.erase(search.cend() - 1);
-                tty.cursor_back(1);
-                tty.erase_line(Term::FORWARD);
-            }
-            selection = 1;
         } else if (ch == Term::CTRL_N) {
             selection = min(selection + 1, i - 1);
         } else if (ch == Term::CTRL_P) {
             selection = max(selection - 1, 1);
-        } else if (ch == Term::CTRL_U) {
-            search.clear();
-            tty.erase_line();
-            tty.move_to_col(1);
-            tty.puts("> ");
-            selection = 1;
         } else {
-            search += ch;
-            tty.putchar(ch);
-            selection = 1;
+            if (prompt.handle_key(static_cast<Term::Key>(ch))) {
+                selection = 1;
+            }
         }
         tty.putchar('\n');
         tty.erase_display(Term::FORWARD);

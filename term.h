@@ -59,6 +59,7 @@ public:
     ~Term();
 
     int puts(const char *str);
+    int puts_highlighted(const char *str);
     int putchar(int ch);
     int getchar();
 

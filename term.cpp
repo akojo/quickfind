@@ -41,6 +41,10 @@ int Term::puts(const char *str)
     return fprintf(tty, "%s", str);
 }
 
+int Term::puts_highlighted(const char *str) {
+    return fprintf(tty, "\033[7m%s\033[0m", str);
+}
+
 int Term::putchar(int ch){
     return fputc(ch, tty);
 }
