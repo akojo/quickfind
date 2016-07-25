@@ -15,6 +15,10 @@ recollection of what was the exact name of the file to be searched.
 the main difference being that it should be quite a bit faster since it's been
 written in C++ instead of Ruby.
 
+## Demo
+[![qfind demo](https://asciinema.org/a/2p38rdci1y6nc7f3wqud71f6l.png)](https://asciinema.org/a/2p38rdci1y6nc7f3wqud71f6l)
+[![qselect demo](https://asciinema.org/a/d8zn697rk9udi7u8vcvftg5qn.png)](https://asciinema.org/a/d8zn697rk9udi7u8vcvftg5qn)
+
 ## qfind
 
 `qfind` is very simple file/directory search program, its invocation being
@@ -63,6 +67,14 @@ The search UI is presented by opening `/dev/tty` and reading/writing there, so t
 * `Ctrl-U` clears the search string
 * `Ctrl-N` and `Ctrl-P` select the next and previous match from the presented list
 * `Enter` selects the highlighted match and prints it to standard out
+
+To search the contents of a file use the following command
+
+```
+qselect < <path to file>
+```
+
+now you can type the keywords and get the appropriate results.
 
 ## Building and installing
 
