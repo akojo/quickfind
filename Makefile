@@ -18,7 +18,7 @@ endef
 prefix ?= /usr
 programs = qfind qselect
 qfind_objs = qfind.o dir.o match.o
-qselect_objs = qselect.o match.o term.o
+qselect_objs = qselect.o match.o term.o prompt.o
 
 CXXFLAGS += -std=c++14 -Wall -Werror
 
