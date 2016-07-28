@@ -16,7 +16,7 @@ int main(void)
     vector<wstr> input;
     string line;
 
-    while (getline(cin, line)) input.emplace_back(line);
+    while (getline(cin, line)) input.emplace_back(wstr{line});
 
     Term tty("/dev/tty");
     Term::Size screen_size = tty.get_screen_size();
