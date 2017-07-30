@@ -6,6 +6,8 @@ extern "C" {
 #include <termios.h>
 }
 
+#include <string>
+
 class Term
 {
 public:
@@ -55,11 +57,11 @@ public:
         int columns;
     };
 
-    Term(const char* ttyName);
+    Term(const std::string& ttyName);
     ~Term();
 
-    int puts(const char *str);
-    int puts_highlighted(const char *str);
+    int puts(const std::string& str);
+    int puts_highlighted(const std::string& str);
     int putchar(int ch);
     int getchar();
 

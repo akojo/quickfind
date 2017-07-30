@@ -16,9 +16,9 @@ extern "C" {
 
 using namespace std;
 
-Term::Term(const char* ttyName)
+Term::Term(const string& ttyName)
 {
-    tty = fopen(ttyName, "r+");
+    tty = fopen(ttyName.c_str(), "r+");
     if (!tty)
         throw invalid_argument("bad tty");
     setbuf(tty, nullptr);
@@ -40,13 +40,13 @@ Term::~Term()
     fclose(tty);
 }
 
-int Term::puts(const char *str)
+int Term::puts(const string& str)
 {
-    return fprintf(tty, "%s", str);
+    return fprintf(tty, "%s", str.c_str());
 }
 
-int Term::puts_highlighted(const char *str) {
-    return fprintf(tty, "\033[7m%s\033[0m", str);
+int Term::puts_highlighted(const string& str) {
+    return fprintf(tty, "\033[7m%s\033[0m", str.c_str());
 }
 
 int Term::putchar(int ch){
