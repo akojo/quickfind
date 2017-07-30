@@ -1,52 +1,32 @@
-#include "prompt.h"
 #include <iostream>
 #include <iterator>
 
+#include "prompt.h"
+
 Prompt::Prompt(Term& tty, const std::string& prompt)
-    : tty{tty}, prompt{prompt}
-      
+    : tty{tty}, prompt{prompt}, input{}
 {
-    pos = search_query.begin();
     tty.puts((prompt + "\n").c_str());
 }
+
 bool Prompt::handle_key(const Term::Key key)
 {
-    bool reset_selection = false;
+    bool reset_selection = true;
 
-    switch (key) {
-    case Term::DEL:
-    case Term::BACKSPACE:
-        if (search_query.length() > 0 && pos != search_query.begin()) {
-            pos = std::prev(search_query.erase(pos));
-            tty.cursor_back(1);
-            tty.erase_line(Term::FORWARD);
-            reset_selection = true;
+    if (isprint(key)) {
+        input.push_back(key);
+    } else if (input.length() > 0) {
+        if (key == Term::DEL || key == Term::BACKSPACE) {
+            input.pop_back();
+        } else if (key == Term::CTRL_U) {
+            input.clear();
         }
-        break;
-
-    case Term::CTRL_U:
-        search_query.clear();
-        pos = search_query.begin();
-        tty.move_to_col(1);
-        tty.puts(prompt.c_str());
-        reset_selection = true;
-        break;
-
-    default:
-        pos = std::next(search_query.insert(pos, key));
-        tty.putchar(key);
-        reset_selection = true;
+        reset_selection = false;
+    } else {
+        reset_selection = false;
     }
-
-    tty.erase_display(Term::FORWARD);
-
+    tty.move_to_col(1);
+    tty.erase_line(Term::FORWARD);
+    tty.puts(prompt + input);
     return reset_selection;
-}
-
-int Prompt::current_column() {
-    return prompt.length() + std::distance(search_query.begin(), pos) + 1;
-}
-
-const std::string& Prompt::query() {
-    return search_query;
 }

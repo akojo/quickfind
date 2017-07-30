@@ -7,12 +7,11 @@ public:
     Prompt(Term& tty, const std::string& prompt);
 
     bool handle_key(const Term::Key key);
-    int current_column();
-    const std::string& query();
+    const int current_column() { return prompt.length() + input.length() + 1; }
+    const std::string query() { return input; }
 
 private:
     Term tty;
     std::string prompt;
-    std::string search_query;
-    std::string::iterator pos;
+    std::string input;
 };
