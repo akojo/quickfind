@@ -1,14 +1,18 @@
 #include "term.h"
 
+#include <cerrno>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
+
 extern "C" {
-#include <stdio.h>
-#include <stdlib.h>
 #include <sys/ioctl.h>
 #include <termios.h>
 #include <unistd.h>
 }
 
 #include <stdexcept>
+#include <string>
 
 using namespace std;
 
@@ -25,9 +29,9 @@ Term::Term(const char* ttyName)
 
     new_termios = old_termios;
     new_termios.c_lflag &= ~(ECHO | ICANON | IEXTEN | ISIG);
-    if (tcsetattr(fd, TCSAFLUSH, &new_termios) < 0)
-        throw runtime_error("failed to set terminal parameters");
-
+    if (tcsetattr(fd, TCSAFLUSH, &new_termios) < 0) {
+        throw runtime_error(string("failed to set terminal parameters: ") + strerror(errno));
+    }
 }
 
 Term::~Term()
