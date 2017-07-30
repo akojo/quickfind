@@ -11,6 +11,8 @@ using namespace std;
 
 static const int MAXLINES = 20;
 
+static char handle_escape(Term &tty);
+
 int main(void)
 {
     vector<wstr> input;
@@ -33,9 +35,9 @@ int main(void)
         for (; it != last; ++i, ++it) {
             string str = (*it).str.substr(0, screen_size.columns);
             if (i == selection) {
-                tty.puts_highlighted(str.c_str());
+                tty.puts_highlighted(str);
             } else {
-                tty.puts(str.c_str());
+                tty.puts(str);
             }
             if (i == MAXLINES)
                 break;
@@ -45,16 +47,18 @@ int main(void)
         tty.move_to_col(prompt.current_column());
 
         ch = tty.getchar();
-        if (ch == Term::ESC || ch == Term::CTRL_C || ch == Term::ENTER) {
+        if (ch == Term::ESC) {
+            ch = handle_escape(tty);
+        }
+
+        if (ch == Term::CTRL_C || ch == Term::ENTER) {
             break;
         } else if (ch == Term::CTRL_N) {
             selection = min(selection + 1, i - 1);
         } else if (ch == Term::CTRL_P) {
             selection = max(selection - 1, 1);
-        } else {
-            if (prompt.handle_key(static_cast<Term::Key>(ch))) {
-                selection = 1;
-            }
+        } else if (prompt.handle_key(static_cast<Term::Key>(ch))) {
+            selection = 1;
         }
         tty.putchar('\n');
         tty.erase_display(Term::FORWARD);
@@ -68,4 +72,20 @@ int main(void)
         return 0;
     }
     return 1;
+}
+
+static char handle_escape(Term &tty)
+{
+    char ch = tty.getchar();
+    if (ch != '[')  {
+        return ch;
+    }
+    ch = tty.getchar();
+    if (ch == 'A' || ch == 'D') {
+        return Term::CTRL_P;
+    } else if (ch == 'B' || ch == 'C') {
+        return Term::CTRL_N;
+    } else {
+        return 0;
+    }
 }
