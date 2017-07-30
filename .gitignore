@@ -1,4 +1,4 @@
 *.o
 .*.d
-qf
-qs
+qfind
+qselect
