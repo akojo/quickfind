@@ -89,9 +89,9 @@ To build and install both programs, just run
 `$ make && make install`
 
 By default the `Makefile` will try to install the programs under `/usr`; this
-can be changed using `PREFIX` environment variable, e.g.
+can be changed using `prefix` variable, e.g.
 
-`$ PREFIX=~/ make && make install`
+`$ make prefix=$HOME && make install prefix=$HOME`
 
 ## Algorithm
 
