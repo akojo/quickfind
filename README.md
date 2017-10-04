@@ -76,6 +76,12 @@ qselect < <path to file>
 
 now you can type the keywords and get the appropriate results.
 
+## Install using Homebrew
+
+```
+brew install nkauppila/homebrew-quickfind/quickfind
+```
+
 ## Building and installing
 
 To build and install both programs, just run
