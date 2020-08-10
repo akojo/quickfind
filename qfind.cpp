@@ -11,8 +11,8 @@ using namespace std;
 void usage(void)
 {
     cerr << "Quickfind version 1.0" << endl;
-    cerr << "Usage: qf [-adf] <pattern> [path...]" << endl;
-    cerr << "       qf -h" << endl;
+    cerr << "Usage: qfind [-adf] <pattern> [path...]" << endl;
+    cerr << "       qfind -h" << endl;
     cerr << "Where options are:" << endl;
     cerr << "  -a  Show also hidden files and directories" << endl;
     cerr << "  -d  Print matching directories" << endl;
