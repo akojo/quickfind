@@ -23,11 +23,11 @@ Term::Term(const string& ttyName)
         throw invalid_argument("bad tty");
     setbuf(tty, nullptr);
 
-    fd = fileno(tty);
+    int fd = fileno(tty);
     if (tcgetattr(fd, &old_termios) < 0)
         throw runtime_error("failed to read terminal parameters");
 
-    new_termios = old_termios;
+    struct termios new_termios = old_termios;
     new_termios.c_lflag &= ~(ECHO | ICANON | IEXTEN | ISIG);
     if (tcsetattr(fd, TCSAFLUSH, &new_termios) < 0) {
         throw runtime_error(string("failed to set terminal parameters: ") + strerror(errno));
@@ -36,13 +36,12 @@ Term::Term(const string& ttyName)
 
 Term::~Term()
 {
-    tcsetattr(fd, TCSAFLUSH, &old_termios);
-    fclose(tty);
+    tcsetattr(fileno(tty), TCSAFLUSH, &old_termios);
 }
 
 int Term::puts(const string& str)
 {
-    return fprintf(tty, "%s", str.c_str());
+    return fputs(str.c_str(), tty);
 }
 
 int Term::puts_highlighted(const string& str) {
@@ -50,25 +49,24 @@ int Term::puts_highlighted(const string& str) {
 }
 
 int Term::putchar(int ch){
-    return fputc(ch, tty);
+    return putc(ch, tty);
 }
 
 int Term::getchar()
 {
     int i;
-    char c;
-    i = read(fd, &c, 1);
+    i = getc(tty);
     if (i == 0)
         return -1;
     if (i < 0)
         throw runtime_error("read error");
-    return static_cast<int>(c);
+    return i;
 }
 
 Term::Size Term::get_screen_size()
 {
     struct winsize ws;
-    ioctl(fd, TIOCGWINSZ, &ws);
+    ioctl(fileno(tty), TIOCGWINSZ, &ws);
     return Size{ws.ws_row, ws.ws_col};
 }
 

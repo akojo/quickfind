@@ -75,9 +75,8 @@ public:
     void erase_line(Direction d = Term::BOTH);
 
 private:
-    int fd;
     FILE *tty;
-    struct termios old_termios, new_termios;
+    struct termios old_termios;
 };
 
 #endif // TERM_H
